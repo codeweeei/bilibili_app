@@ -4,13 +4,13 @@
     <div class="acticle" v-if="model">
       <video :src="model.content" controls="controls"></video>
       <div class="acticle_title">
-        <span>{{model.category.title}}</span>
-        <span>{{model.name}}</span>
-        <van-collapse v-model="activeNames">
-          <van-collapse-item  name="1">喜欢的话就关注收藏吧</van-collapse-item>
-        </van-collapse>
-        <span>
-        </span>
+        <div class="left">
+          <span>{{model.category.title}}</span>
+          <span>{{model.name}}</span>
+        </div>
+        <div class="right">
+          <img src="@/assets/more.svg" alt @click="foldheight=foldheight==0?20:0" :class="{spread:foldheight}">
+        </div>
       </div>
       <div class="acticle_detail">
         <div class="acticle_detail_up">
@@ -24,25 +24,36 @@
           <span>{{model.date}}</span>
         </div>
       </div>
+      <div class="fold_container" :style="{height: foldheight + 'px'}">
+        <p class="fold_desc">
+          恭喜你，发现一个宝藏！！
+        </p>
+      </div>
       <div class="acticle_icon">
         <div @click="collectClick" :class="{'collectActive':iscollectActive}"><span class="icon-star-full"></span>收藏</div>
         <div><span class="icon-box-add"></span>缓存</div>
         <div><span class="icon-redo2"></span>分享</div>
       </div>
-      <div class="detail_parent">
-        <cover 
-          class="detail_item_artcle" 
-          v-for="(item,index) in commendData" 
-          :key="index" 
-          :detailItem=item 
-        />
-      </div>
-      <div style="width:100%">
-        <discuss :commentlen="commentlenth" @postcomment="postcomment" ref="dissself"></discuss>
-      </div>
-      <div style="width:100%">
-        <comment @getcomlen="res => commentlenth=res" @answerid="answerid" ref="commentupdata"/>
-      </div>
+      <van-tabs v-model="active" animated>
+        <van-tab title="推荐">
+          <div class="detail_parent">
+            <cover 
+              class="detail_item_artcle" 
+              v-for="(item,index) in commendData" 
+              :key="index" 
+              :detailItem=item 
+            />
+          </div>
+        </van-tab>
+        <van-tab title="评论">
+          <div style="width:100%">
+            <discuss :commentlen="commentlenth" @postcomment="postcomment" ref="dissself"></discuss>
+          </div>
+          <div style="width:100%">
+            <comment @getcomlen="res => commentlenth=res" @answerid="answerid" ref="commentupdata"/>
+          </div>
+        </van-tab>
+      </van-tabs>
     </div>
   </div>
 </template>
@@ -63,6 +74,7 @@ export default {
   data(){
     return{
       model:null,
+      //推荐视频
       commendData:[],
       commentlenth:null,
       commentmodel:{
@@ -71,9 +83,14 @@ export default {
         article_id:null,
         parent_id:null
       },
+      //收藏
       iscollectActive:null,
+      //关注
       issubscribe:null,
-      activeNames:[1]
+      //折叠
+      foldheight:0,
+      //标签页
+      active:0
     }
   },
   methods: {
@@ -182,13 +199,14 @@ export default {
         this.issubscribe=res.data.success
       }
     },
+    //回复评论聚焦到input输入框
     answerid(id){
       this.commentmodel.parent_id=id
       // console.log(id)
       // console.log(this.commentmodel)
       //获取到discuss子组件标签，调用他里面得iptfocus（）方法聚焦输入框
       this.$refs.dissself.iptfocus()
-    }
+    },
   },
   created() {
     this.acticleData()
@@ -229,21 +247,26 @@ export default {
     .acticle_title{
       padding: 4vw;
       background: white;
-      span:nth-child(1){
-        height: 5.333vw;
-        padding: 0 2.133vw;
-        background: #f4f4f4;
-        border-radius: 2.667vw;
-        color: #fb7299;
-        font-size: 3.2vw;
-        margin-right: 1.333vw;
+      display: flex;
+      .left{
+        flex: 1;
+        span:nth-child(1){
+          height: 5.333vw;
+          padding: 0 2.133vw;
+          background: #f4f4f4;
+          border-radius: 2.667vw;
+          color: #fb7299;
+          font-size: 3.2vw;
+          margin-right: 1.333vw;
+        }
       }
-      span:nth-child(3){
-        position: relative;
+      .spread{
+        -webkit-transform: rotate(180deg);
+        transform: rotate(180deg);
       }
     }
     .acticle_detail{
-      padding-bottom: 4vw;
+      padding-bottom: 3.2vw;
       background: white;
       display: flex;
       .acticle_detail_up{
@@ -289,6 +312,17 @@ export default {
           font-size: 5.333vw;
           padding-right: 1.333vw;
         }
+      }
+    }
+    .fold_container{
+      -webkit-transition: height .3s;
+      transition: height .3s;
+      padding: 0 4.267vw;
+      overflow: hidden;
+      margin-bottom: 10px;
+      .fold_desc{
+      font-size: 3.467vw;
+      color: #999;
       }
     }
   }
