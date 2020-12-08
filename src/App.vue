@@ -1,28 +1,34 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <keep-alive>
+      <router-view v-if="$route.meta.keepalive"></router-view>
+    </keep-alive>
+    <router-view v-if="!$route.meta.keepalive"></router-view>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+
+// import RegisterView from '@/views/RegisterView'
 
 export default {
   name: 'App',
-  components: {
-    HelloWorld
-  }
+  // components: {
+  //   RegisterView
+  // }
 }
 </script>
+  
+<style lang="less">
+  body{
+    margin: 0;
+    padding: 0;
+    background: #f4f4f4;
+    box-sizing: border-box;
+    display: block;
+  }
+  p{
+    margin: 0;
+  } 
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
 </style>
