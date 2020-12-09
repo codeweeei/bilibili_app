@@ -60,7 +60,7 @@ export default {
   .discuss{
     width: 100%;
     box-sizing: border-box;
-    padding:8vw 2.667vw 2.667vw;
+    padding:20px 2.667vw 2.667vw;
     .discuss_top{
       display: flex;
       padding: 2.667vw 2.667vw 2.667vw 0;
