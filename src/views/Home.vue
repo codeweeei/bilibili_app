@@ -1,50 +1,59 @@
 <template>
 <div class="home" v-if="category">
   <user-navbar />
-  <div class="tab_parent">
-        <div class="tab_setting" :class="{'setting_fix':isfixed}" @click="$router.push('/editcategory')">
-          <van-icon name="setting-o" />
-        </div>
-        <van-tabs v-model="active" swipeable sticky>
-          <van-tab v-for="(item,index) in category" :key="index" :title="item.title" class="tab">
-            <van-list
-              v-model="item.loading"
-              :finished="item.finished"
-              finished-text="没有更多了"
-              :immediate-check="false"
-              @load="onLoad"
-            >
-              <div class="detail_parent">
-                <cover 
-                  class="detail_item_home" 
-                  :detailItem="categoryitem" 
-                  v-for="(categoryitem,categoryindex) in item.list"
-                  :key="categoryindex" 
-                />
-              </div>
-            </van-list>
-          </van-tab>
-      </van-tabs>
+  <div class="tab_setting" v-show="!setishow" @click="$router.push('/editcategory')">
+    <van-icon name="setting-o" />
   </div>
+  <div class="tab_parent">
+    <div class="tab_fixed" v-show="setishow"  @click="$router.push('/editcategory')">
+      <van-icon name="setting-o" />
+    </div>
+    <van-tabs 
+      v-model="active" 
+      swipeable 
+      sticky
+    >
+      <van-tab v-for="(item,index) in category" :key="index" :title="item.title" class="tab">
+        <van-list
+          v-model="item.loading"
+          :finished="item.finished"
+          finished-text="没有更多了"
+          :immediate-check="false"
+          @load="onLoad"
+        >
+          <div class="detail_parent">
+            <cover 
+              class="detail_item_home" 
+              :detailItem="categoryitem" 
+              v-for="(categoryitem,categoryindex) in item.list"
+              :key="categoryindex" 
+            />
+          </div>
+        </van-list>
+      </van-tab>
+    </van-tabs>
+  </div>
+  <to-top :isShow="showheight"/>
 </div>
 </template>
 
 <script>
 import UserNavbar from '@/components/common/UserNavbar'
 import Cover from '@/views/Cover'
+import ToTop from '@/components/common/ToTop.vue'
 export default {
   name:"Home",
   components:{
     UserNavbar,
-    Cover
+    Cover,
+    ToTop
   },
   data() {
     return {
       active:0,
       category:[],
-      isfixed:false
-      // loading:false,
-      // finished:false
+      setishow: true,
+      showheight: false
     }
   },
   methods: {
@@ -106,11 +115,26 @@ export default {
         this.selectArticle()
       },1000)
     },
+    //处理滚动
     handleScroll(){
-      let scrollTop= document.documentElement.scrollTop
+      let scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
+      // console.log(scrollTop)
+      //滚动吸附
       if(scrollTop>45){
-        this.isfixed=true
+        this.setishow=false
+        //滚动显示回到顶部按钮
+        if(scrollTop>100){
+          // console.log("---")
+          this.showheight=true
+        }
+        else{
+          this.showheight=false
+        }
       }
+      else{
+        this.setishow=true
+      }
+      
     }
   },
   watch: {
@@ -132,46 +156,47 @@ export default {
     this.selectCategory()
   },
   mounted() {
-    //添加监听器用来监听滚轮的滚动
-    window.addEventListener("scroll",this.handleScroll); 
+    window.addEventListener('scroll',this.handleScroll, true)
   },
+  //销毁监听滚动
   destroyed() {
-      document.removeEventListener('scroll', this.handleScroll)
-  }
+    // 离开该页面需要移除这个监听的事件，不然会报错  必须带第三个参数true，否则销毁不成功
+    window.removeEventListener('scroll', this.handleScroll, true)
+  },
 }
 </script>
 
 <style lang="less">
   .home{
     position: relative;
+    .tab_setting{
+      position: fixed;
+      top:0;
+      right: 10px;
+      width: 5.333vw;
+      height: 11.733vw;
+      color: #ff9db5;
+      font-size: 5.867vw;
+      line-height: 13.867vw;
+      text-align: center;
+      z-index: 999;
+      background-color: #fff; 
+    }
     .tab_parent{
+      box-sizing: border-box;
       position: relative;
       overflow: hidden;
-      .tab_setting{
-          position: absolute;
-          right: 10px;
-          // top: 12.5vw;
-          width: 5.333vw;
-          height: 11.733vw;
-          color: #ff9db5;
-          font-size: 5.867vw;
-          line-height: 13.867vw;
-          text-align: center;
-          z-index: 999;
-          background-color: #fff; 
-      }
-      .setting_fixed{
+      .tab_fixed{
         position: absolute;
-        // right: 10px;
-        // width: 5.333vw;
-        // height: 11.733vw;
-        // color: #ff9db5;
-        // font-size: 5.867vw;
-        // line-height: 13.867vw;
-        // text-align: center;
-        // z-index: 999;
-        // background-color: #fff; 
-        top:12vw
+        right: 10px;
+        width: 5.333vw;
+        height: 11.733vw;
+        color: #ff9db5;
+        font-size: 5.867vw;
+        line-height: 13.867vw;
+        text-align: center;
+        z-index: 999;
+        background-color: #fff; 
       }
       .detail_parent{
         display: flex;
@@ -184,6 +209,7 @@ export default {
       }
     }
   }
+  
   
   
   
